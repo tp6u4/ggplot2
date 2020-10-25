@@ -1,0 +1,67 @@
+#ggplot各種圖形比較
+###################################################################
+
+#
+#geom_density
+ggplot(data = predict.table, aes(predict_prob, fill = true_label, colour = true_label)) +
+    geom_density(alpha = 0.3) + #alpha為曲線下面積透明度
+    xlab("Predict Prob") + ylab("Density") +
+    ggtitle("Density Plot of predict_prob")
+
+#
+#geom_bar
+ggplot(data = summary.table, aes(x = var_name, y = coefficient)) + geom_bar(aes(fill = var_name),
+        position = "dodge",  #position = "dodge" 為並排顯示, "stack"為堆疊, ”fill"填滿成同高度(標準化)
+        stat = "identity",   # stat ="identity" 為自行計算次數
+        show.legend = F) +
+    theme_bw(base_size = 14) +    #座標軸及標題字體大小
+    labs(title = "Coefficients of Final Model",
+         x = "Coefficients", y = "Impact on Cusomer Loyalty") + coord_flip() 
+
+
+#
+#geom_tile(熱圖)
+ggplot(melt(cor(NBAPlayerDataUnique[, 4:ncol(NBAPlayerDataUnique)])), 
+       aes(x = Var1, y = Var2)) + 
+    geom_tile(aes(fill = value), colour = "gray") + #這邊color為隔線顏色
+    #scale_fill_gradient2為漸層顏色設定、midpoint為中點數值(default=0)、mid為cor為0顏色
+    scale_fill_gradient2(low = "turquoise", high = "brown", 
+                         mid = "white", midpoint = 0) +
+    #guides為設定圖例位置及顏色, 這邊如果寫colour = guide_legend(),圖例標題不會成功
+    guides(fill = guide_legend(title = "Correlation")) +    
+    theme_bw() + 
+    #調整相關座標軸、圖例位置的設定theme, legend.position = "bottom" 圖例位置會在下面
+    theme(axis.text.x = element_text(angle = 0, hjust = 1, vjust = 1),
+          axis.title = element_blank())
+
+ggplot(CorMatrix, aes(x = Var1, y = Var2)) +
+    geom_tile(aes(fill = value), col = "black") +
+    #設定低度相關和高度相關的磚塊顏色, mid為相關性為0顏色,midpoint設定無相關的係數為0
+    scale_fill_gradient2(low = "navyblue", high = "tomato3", mid = "white", midpoint = 0) +
+    guides(fill = guide_legend(title = "Correlation")) + 
+    theme(axis.text.x = element_text(angle = 0, hjust = 0.5, vjust = 1), #hjust調整水平座標籤位置
+          axis.title = element_blank()) # element_blank()隱藏座標軸名稱
+
+#
+#geom_point
+ggplot(error.tb, aes(x = k.values, y = error.rate)) + geom_point(size = 0.8) + 
+    geom_text(aes(label = k.values), vjust = 3, size = 2, colour = "red") +
+    geom_line(lty = "dotted", colour = 'blue') +theme_bw()
+
+
+
+#
+#geom_boxplot
+ggplot( data = ClusterResultForPlot) + 
+    geom_boxplot( aes( x = Continuous_Variable,
+                       y = Normalized_Value, 
+                       col = Continuous_Variable),
+                  size = 0.7) + 
+    facet_wrap( ~ Cluster, labeller = "label_both") #labeller 修改分類的label名稱
+
+ggplot(test.data, aes(x = country, y = purchase_amount, colour = device)) +
+    geom_boxplot() +
+    xlab("Country") + ylab("Purchase Amount") +
+    ggtitle("Boxplot of Purchase Amount by Country: Device versus Control") +
+    theme_bw()
+
